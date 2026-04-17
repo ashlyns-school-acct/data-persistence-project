@@ -3,22 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
+    public static MainManager Instance;
+
     public Brick BrickPrefab;
     public int LineCount = 6;
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text ScoreText2;
     public GameObject GameOverText;
+
+    public string PlayerName;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+
+        LoadHighscore();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -58,7 +77,14 @@ public class MainManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                LoadHighscore();
             }
+        }
+
+        if (m_Points > PlayerPrefs.GetInt("HighScore", 0))
+        {
+            ScoreText2.text = $"Best Score : {PlayerName} : {m_Points}";
+            SaveHighscore();
         }
     }
 
@@ -73,4 +99,33 @@ public class MainManager : MonoBehaviour
         m_GameOver = true;
         GameOverText.SetActive(true);
     }
+
+    [System.Serializable]
+    class SaveData
+    {
+        public int Highscore;
+    }
+
+    public void SaveHighscore()
+    {
+        SaveData data = new SaveData();
+        data.Highscore = m_Points;
+
+        string json = JsonUtility.ToJson(data);
+
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
+    public void LoadHighscore()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            SaveData data = JsonUtility.FromJson<SaveData>(json);
+
+            m_Points = data.Highscore;
+        }
+    }
+
 }
