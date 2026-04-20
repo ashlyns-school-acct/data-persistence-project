@@ -17,10 +17,11 @@ public class MainManager : MonoBehaviour
     public Text ScoreText2;
     public GameObject GameOverText;
 
-    public string PlayerName;
-    
+    public static string PlayerName;
+    public int HighScore;
+
     private bool m_Started = false;
-    private int m_Points;
+    private int m_Points = 0;
     
     private bool m_GameOver = false;
 
@@ -33,7 +34,6 @@ public class MainManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
 
         LoadHighscore();
     }
@@ -41,6 +41,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
+        
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -64,6 +66,7 @@ public class MainManager : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 m_Started = true;
+                m_Points = 0;
                 float randomDirection = Random.Range(-1.0f, 1.0f);
                 Vector3 forceDir = new Vector3(randomDirection, 1, 0);
                 forceDir.Normalize();
@@ -81,9 +84,10 @@ public class MainManager : MonoBehaviour
             }
         }
 
-        if (m_Points > PlayerPrefs.GetInt("HighScore", 0))
+        if (m_Points > HighScore)
         {
-            ScoreText2.text = $"Best Score : {PlayerName} : {m_Points}";
+            HighScore = m_Points;
+            ScoreText2.text = $"Best Score : {PlayerName} : {HighScore}";
             SaveHighscore();
         }
     }
@@ -104,12 +108,14 @@ public class MainManager : MonoBehaviour
     class SaveData
     {
         public int Highscore;
+        public string Name;
     }
 
     public void SaveHighscore()
     {
         SaveData data = new SaveData();
         data.Highscore = m_Points;
+        data.Name = PlayerName;
 
         string json = JsonUtility.ToJson(data);
 
@@ -125,6 +131,7 @@ public class MainManager : MonoBehaviour
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
             m_Points = data.Highscore;
+            PlayerName = data.Name;
         }
     }
 
