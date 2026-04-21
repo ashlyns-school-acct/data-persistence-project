@@ -35,7 +35,7 @@ public class MenuUiHandler : MonoBehaviour
 
     public void SetPlayerName()
     {
-        MainManager.PlayerName = playerNameInput.text;
+        MainManager.Instance.PlayerName = playerNameInput.text;
     }
 
 }
