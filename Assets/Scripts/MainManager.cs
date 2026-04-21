@@ -61,6 +61,7 @@ public class MainManager : MonoBehaviour
 
     private void Update()
     {
+
         if (!m_Started)
         {
             if (Input.GetKeyDown(KeyCode.Space))
