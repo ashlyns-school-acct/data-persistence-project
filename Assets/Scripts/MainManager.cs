@@ -17,7 +17,6 @@ public class MainManager : MonoBehaviour
     public Text ScoreText2;
     public GameObject GameOverText;
 
-    public string PlayerName;
     public int HighScore;
 
     private bool m_Started = false;
@@ -38,11 +37,13 @@ public class MainManager : MonoBehaviour
         LoadHighscore();
     }
 
+    public string Names = NameHolder.Instance.PlayerName;
+
     // Start is called before the first frame update
     void Start()
     {
-        
-        
+        ScoreText2.text = $"Best Score : {Names} : {HighScore}";
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -88,7 +89,7 @@ public class MainManager : MonoBehaviour
         if (m_Points > HighScore)
         {
             HighScore = m_Points;
-            ScoreText2.text = $"Best Score : {PlayerName} : {HighScore}";
+            ScoreText2.text = $"Best Score : {Names} : {HighScore}";
             SaveHighscore();
         }
     }
@@ -114,9 +115,10 @@ public class MainManager : MonoBehaviour
 
     public void SaveHighscore()
     {
+        Names = NameHolder.Instance.PlayerName;
         SaveData data = new SaveData();
-        data.Highscore = m_Points;
-        data.Name = PlayerName;
+        data.Highscore = HighScore;
+        data.Name = NameHolder.Instance.PlayerName;
 
         string json = JsonUtility.ToJson(data);
 
@@ -131,8 +133,8 @@ public class MainManager : MonoBehaviour
             string json = File.ReadAllText(path);
             SaveData data = JsonUtility.FromJson<SaveData>(json);
 
-            m_Points = data.Highscore;
-            PlayerName = data.Name;
+            HighScore = data.Highscore;
+            Names = data.Name;
         }
     }
 

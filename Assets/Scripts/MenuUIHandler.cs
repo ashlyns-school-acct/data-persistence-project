@@ -22,6 +22,7 @@ public class MenuUiHandler : MonoBehaviour
 
     public void StartNew()
     {
+        SetPlayerName();
         SceneManager.LoadScene(1);
     }
      public void Exit()
@@ -35,9 +36,7 @@ public class MenuUiHandler : MonoBehaviour
 
     public void SetPlayerName()
     {
-        print(playerNameInput.text);
-        MainManager.Instance.PlayerName = playerNameInput.text;
-        
+        NameHolder.Instance.PlayerName = playerNameInput.text;
     }
 
 }
